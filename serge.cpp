@@ -22,11 +22,13 @@ int posY = 8;
 int playerX = 4;
 int playerY = 16;
 
+bool key = false;
+
 // Utiliser les constantes pour définir le tableau de couleurs
 string colors[NB_CASES][NB_CASES] = {
-    {GREEN, RED, RED, RED, RED, RED, RED, RED, RED, BLACK},                 //LIGNE 0
+    {RED, RED, RED, RED, RED, RED, RED, RED, RED, BLACK},                   //LIGNE 0
     {RED, BLACK, BLACK, RED, BLACK, BLACK, RED, BLACK, RED, BLACK},         //LIGNE 1
-    {RED, BLACK, BLUE, RED, BLACK, BLACK, RED, BLACK, RED, BLACK},          //LIGNE 2
+    {RED, BLACK, BLUE, RED, BLACK, MAGENTA, RED, BLACK, RED, BLACK},        //LIGNE 2
     {RED, BLACK, BLACK, RED, BLACK, BLACK, RED, BLACK, RED, YELLOW},        //LIGNE 3
     {RED, BLACK, BLACK, RED, BLUE, BLACK, RED, BLUE, RED, BLACK},           //LIGNE 4
     {RED, BLACK, BLACK, RED, BLACK, BLACK, RED, BLACK, RED, BLACK},         //LIGNE 5
@@ -36,13 +38,26 @@ string colors[NB_CASES][NB_CASES] = {
     {BLACK, BLACK, BLUE, BLACK, BLACK, BLACK, BLUE, BLACK, BLUE, BLACK}     //LIGNE 9
 };
 
-// Fonction pour afficher la grille
-void displayMap() {
+int salles[NB_CASES][NB_CASES] = {
+    {0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0},
+    {0,0,3041,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,0,0,0},
+    {0,0,0,0,3024,0,0,3018,0,0},
+    {0,0,0,0,0,0,0,0,0,0},
+    {0,0,3035,0,0,0,0,0,0,0},
+    {0,0,0,0,0,0,0,3016,0,0},
+    {0,0,0,0,0,0,0,0,0,0},
+    {0,0,3032,0,0,0,3027,0,3014,0},
+};
+
+// Fonction pour afficher la carte
+void showMap() {
     system("cls");
 
     for (int i = 0; i < GRIDSIZE; ++i) {
         for (int j = 0; j < GRIDSIZE; ++j) {
-            if ((i == playerY || i == playerY + 1) && (j == playerX || j == playerX + 1)) {
+            if ((i/2 == posY) && (j/2 == posX)) {
                 cout << RESET << "00"; // Case vide au milieu
             } else {
                 cout << colors[i/2][j/2] << "[]" << RESET; // Case
@@ -52,36 +67,52 @@ void displayMap() {
     }
 }
 
-void movePlayer(char c)
-{
+bool verifyMovement(string couleur){
+    system("cls");
+    if(couleur == BLACK){
+        cout << "Vous ne pouvez pas (encore) traverser les murs.";
+        Sleep(500);
+        return false;
+    }
+    else if(couleur == MAGENTA && key == false){
+        cout << MAGENTA << "Vous n'avez pas les autorisations pour entrer ici.\n" << RESET;
+        Sleep(1000);
+        return false;
+    }
+    else
+        return true;
+
+}
+
+void movePlayer(char c){
     switch (c) {
-        case 'w':
+        case 'W':
             if (posY > 0) {
-                if(colors[posY-1][posX] != BLACK){
+                if(verifyMovement(colors[posY-1][posX])) {
                     playerY -= 2; // Déplacement de deux cases vers le haut
                     posY--;
                 }
             }
             break;
-        case 'a':
+        case 'A':
             if (posX > 0) {
-                if(colors[posY][posX-1] != BLACK){
+                if(verifyMovement(colors[posY][posX-1])) {
                     playerX -= 2; // Déplacement de deux cases vers la gauche
                     posX--;
                 }
             }
             break;
-        case 's':
+        case 'S':
             if (posY < NB_CASES - 1) {
-                if(colors[posY+1][posX] != BLACK){
+                if(verifyMovement(colors[posY+1][posX])) {
                     playerY += 2; // Déplacement de deux cases vers le bas
                     posY++;
                 }
             }
             break;
-        case 'd':
+        case 'D':
             if (posX < NB_CASES - 1) {
-                if(colors[posY][posX+1] != BLACK){
+                if(verifyMovement(colors[posY][posX+1])) {
                     playerX += 2; // Déplacement de deux cases vers la droite
                     posX++;
                 }
@@ -92,35 +123,35 @@ void movePlayer(char c)
     }
 }
 
-void entrerSalle()
-{
+void enterRoom() {
     system("cls");
-    cout << CYAN << "Vous etes dans la salle " << posX << "-" << posY << endl << RESET;
+    cout << CYAN << "Vous etes dans la salle " << salles[posY][posX] << endl << RESET;
     Sleep(1000);
 }
 
-void entrerTech()
-{
+void enterTech() {
     system("cls");
-    cout << YELLOW << "Vous etes dans le bureau des techniciens.\n" << endl << RESET;
+    cout << YELLOW << "Vous etes dans le bureau des techniciens.\n" << RESET;
     Sleep(1000);
 }
 
-void gererSalle()
-{
-    
+void enterSecret(){
+    system("cls");
+    cout << MAGENTA << "Bienvenue dans la salle secrete.\n" << RESET;
+    Sleep(1000);
 }
 
-void findEvent()
-{
-    if(colors[posY][posX] == BLUE)
-        entrerSalle();
-    else if(colors[posY][posX] == YELLOW)
-        entrerTech();
+void findEvent() {
+    string couleur = colors[posY][posX];
+    if(couleur == BLUE)
+        enterRoom();
+    else if(couleur == YELLOW)
+        enterTech();
+    else if(couleur == MAGENTA)
+        enterSecret();
 }
 
-void startGame()
-{
+void showLogo() {
     cout << GREEN;
     cout << "                     /$$       /$$                    \n";
     cout << "                    | $$      |__/                    \n";
@@ -148,8 +179,7 @@ void startGame()
     Sleep(2500);
 }
 
-void indiquerMission()
-{
+void showMission() {
     system("cls");
     cout << RED << "Bienvenue dans le jeu 'Pekinz xpress' !\n";
     cout << "L'equipe P-15 a perdu son robot, et c'est a vous de le retrouver.\n";
@@ -157,27 +187,34 @@ void indiquerMission()
     cout << "et le ramener a Serge, le technicien, avant qu'il ne soit trop tard.\n";
     cout << "Si le robot n'est pas retrouve, une facture de 650$ sera emise!\n";
     cout << "Bonne chance et que la mission commence !\n" << RESET;
-    Sleep(7500);
+    cout << endl << "Appuyer sur entree pour commencer: ";
+    char c;
+
+    do {
+        c = _getch();
+    } while (c != '\r');
 }
 
 int main() {
-    Sleep(10000);
-    startGame();
-    indiquerMission();
+    showLogo();
+    showMission();
 
     char move;
 
-    do {
-        displayMap();
+    while(true){
+        showMap();
 
         cout << "Utilisez les touches WASD pour vous deplacer (Q pour quitter): ";
-        move = _getch();
+        move = toupper(_getch());
 
-        movePlayer(move);
-        findEvent();
-
-
-    } while (move != 'q' && move != 'Q');
+        if(move == 'Q')
+            break;
+        else{
+            movePlayer(move);
+            findEvent();
+        }
+        
+    }
 
     system("cls");
     cout << "Merci d'avoir joue !" << endl;
