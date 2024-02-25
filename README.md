@@ -11,6 +11,8 @@ Cela crée un exécutable que vous pouvez exécuter avec
 ```
 .\a.exe
 ```
+ou en trouvant l'exécutable dans l'explorateur de fichier et en double-cliquant dessus.
+
 Si vous ne l'avez pas encore fait, installez MinGW en vous référant au même document.
 Aussi, n'essayez pas d'utiliser WSL ou Ubuntu à moins que vous ne sachiez ce que vous faites.
 
